@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mvc.stroe.springStore.dao.DaoInterface">
+
+	<!--화면에 뿌려줄 best아이템(조회순)  -->
+	<select id="best" resultType="mvc.stroe.springStore.dto.shoesInfo">
+		<![CDATA[
+			select * from
+			(select shoesNumber, pic, brand, modelName, price, stockCount,cnt,reg_date, rowNum rNum
+			from(select*from stock order by cnt desc))
+			where rNum >=1 and rNum<=6
+		]]>
+	</select>
+	
+	<!--화면에 뿌려줄 recently아이템(등록순) -->
+	<select id="recently" resultType="mvc.stroe.springStore.dto.shoesInfo">
+		<![CDATA[
+			select*from
+			(select shoesNumber, pic, brand, modelName, price, stockCount,cnt,reg_date, rowNum rNum
+			from(select*from stock order by reg_date desc))
+			where rNum >=1 and rNum<=6
+		]]>
+	</select>
+	
+	<!--로그인 아이디 패스워드 체크  -->
+	<select id="idCheck" parameterType="String" resultType="java.util.Map">
+		select memId username, memPwd password,name,enabled,authority
+		from member where memId=#{memId}
+	</select>
+	
+	<!--회원가입 아이디 체크  -->
+	<select id="idconfirm" parameterType="String" resultType="int">
+		SELECT count(memId) 
+		FROM member WHERE memId=#{memId}
+	</select>
+	
+	<!--회원가입 프로세스-->
+	<insert id="joinMem" parameterType="mvc.stroe.springStore.dto.memberInfo">
+		INSERT INTO member
+		(memId,memPwd,address1,address2,address3,name,jumin1,jumin2,hp,email,reg_date)
+		VALUES(#{memId},#{memPwd},#{address1},#{address2},#{address3},#{name},#{jumin1},#{jumin2},#{hp},#{email},#{reg_date})
+	</insert>
+	
+	<!--패스워드 체크  -->
+	<select id="passwordChk" parameterType="String" resultType="String">
+		SELECT memPwd FROM member where memId=#{memId}
+	</select>
+	
+	<!--회원정보 기존데이터-->
+	<select id="modifyForm" parameterType="String" resultType="mvc.stroe.springStore.dto.memberInfo">
+		SELECT*FROM member where memId=#{memId}
+	</select>
+	
+	<!--회원정보 수정 -->
+	<update id="modifyPro" parameterType="java.util.Map" >
+		UPDATE member SET memPwd=#{memPwd}, address1=#{address1}, address2=#{address2}, address3=#{address3}, hp=#{hp}, email=#{email} WHERE memId=#{memId}
+	</update>
+	
+	<!--회원정보 제거-->
+	<delete id="deletePro" parameterType="String">
+		DELETE member WHERE memId=#{memId}
+	</delete>
+	
+	<!--이메일체크(아이디찾기)-->
+	<select id="searchIdPro" parameterType="String" resultType="String">
+		select memId from member where email=#{email}
+	</select>
+	
+	<!-- 이메일 아이디 체크 -->
+	<select id="pwdChk" resultType="int" parameterType="java.util.Map">
+		SELECT count(*) FROM member WHERE memId=#{memId}
+	</select>
+	
+	<!-- 새비밀번호 업데이트 -->
+	<update id="updatePwd" parameterType="java.util.Map">
+		UPDATE member SET memPwd=#{newPwd} WHERE memID=#{memId}
+	</update>
+	
+	<!--재고리스트 총갯수  -->
+	<select id="stockTotal" resultType="String">
+		SELECT count(*) FROM stock
+	</select>
+	
+	<!-- 뿌려줄 리스트 -->
+	<select id="stockList" parameterType="java.util.Map" resultType="mvc.stroe.springStore.dto.shoesInfo">
+	<![CDATA[
+		select*from
+		(select shoesNumber, pic, brand, modelName, price, stockCount,cnt,reg_date, rowNum rNum
+		from(select*from stock order by reg_date desc))
+		where rNum >=#{startList} and rNum<=#{endList}
+	]]>
+	
+	</select>
+	<!--제고 등록-->
+	<insert id="insertStock" parameterType="mvc.stroe.springStore.dto.shoesInfo">
+		INSERT INTO stock
+		(shoesNumber,pic,brand,modelName,price,stockCount,cnt,reg_date)
+		VALUES(#{shoesNumber},#{pic},#{brand},#{modelName},#{price},#{stockCount},#{cnt},#{reg_date})
+	</insert>
+	
+	<!-- 제고삭제 -->
+	<delete id="deleteStockPro" parameterType="int">
+		DELETE stock where shoesNumber=#{shoesNumber}
+	</delete>
+	
+	<!--제고참조값 -->
+	<select id="modifyRef" resultType="mvc.stroe.springStore.dto.shoesInfo" parameterType="int">
+		SELECT*FROM stock WHERE shoesNumber=#{shoesNumber}
+	</select>
+	
+	<!--제고수정  -->
+	<update id="modifyStock" parameterType="mvc.stroe.springStore.dto.shoesInfo" >
+		UPDATE stock SET pic=#{pic}, brand=#{brand}, modelName=#{modelName}, price=#{price}, stockCount=#{stockCount}  WHERE shoesNumber=#{shoesNumber}
+	</update>
+	
+	<!--게시판 총수 -->
+	<select id="boardTotal" parameterType="String" resultType="String">
+		SELECT count(*) FROM (SELECT num, writer, subject, contents, cnt, ref, ref_step, ref_level, reg_date, news, rowNum rNum FROM
+		(SELECT * FROM board WHERE news ='post' and	(subject LIKE '%'||#{word}||'%' or writer LIKE '%'||#{word}||'%')
+		ORDER BY ref desc, ref_step asc))
+	</select>
+	
+	<!--게시판리스트  -->
+	<select id="boardList" parameterType="java.util.Map" resultType="mvc.stroe.springStore.dto.board">
+	<![CDATA[
+		SELECT * FROM (SELECT num, writer, subject, contents, cnt, ref, ref_step, ref_level, reg_date, news, rowNum rNum FROM
+		(SELECT * FROM board WHERE news ='post' and (subject LIKE '%'||#{word}||'%' or writer LIKE '%'||#{word}||'%')  ORDER BY ref desc, ref_step asc))
+		 where rNum >= #{startList} AND rNum <=#{endList}
+	]]>
+	</select>
+	
+	<!--공지사항-->
+	<select id="newsList" resultType="mvc.stroe.springStore.dto.board">
+		select * from board where news='news' order by num desc
+	</select>
+	
+	<!--원본글 인서트-->
+	<insert id="original" parameterType="mvc.stroe.springStore.dto.board">
+		INSERT INTO board(num,writer,subject,contents,cnt,ref,ref_step,ref_level,reg_date,news)
+		VALUES(board_seq.nextval,#{writer},#{subject},#{contents},#{cnt},board_seq.currval,#{ref_step},#{ref_level},#{reg_date},#{news})
+	</insert>
+	
+	<!-- 리플용 ref밀기 -->
+	<update id="pushRef" parameterType="mvc.stroe.springStore.dto.board">
+		<![CDATA[
+		UPDATE board SET ref_step=ref_step+1 WHERE ref=#{ref} AND ref_step > #{ref_step}
+		]]>
+	</update>
+	
+	<!--리플달기  -->
+	<insert id="writeRe" parameterType="mvc.stroe.springStore.dto.board">
+		INSERT INTO board(num,writer,subject,contents,cnt,ref,ref_step,ref_level,reg_date,news)
+		VALUES(board_seq.nextval,#{writer},#{subject},#{contents},0,#{ref},#{ref_step},#{ref_level},#{reg_date},#{news})
+	</insert>
+	
+	<!-- 조회수 증가 -->
+	<update id="viewCnt" parameterType="int">
+		UPDATE board SET cnt=cnt+1 where num =#{num}
+	</update>
+	
+	<!--게시글 보기-->
+	<select id="viewContent" resultType="mvc.stroe.springStore.dto.board" parameterType="int">
+		select*from board where num=#{num}
+	</select>
+	
+	<!-- 게시글 수정하기 -->
+	<update id="modifyContentPro" parameterType="mvc.stroe.springStore.dto.board">
+		UPDATE board set subject=#{subject}, contents=#{contents} where num=#{num}
+	</update>
+	
+	<!--ref 3종샛투 구하기  -->
+	<select id="ref" resultType="mvc.stroe.springStore.dto.board" parameterType="int">
+		SELECT ref, ref_step, ref_level FROM board WHERE num=#{num}
+	</select>
+	
+	<!--max ref 구하기  -->
+	<select id="maxRef" resultType="String" parameterType="java.util.Map">
+	<![CDATA[
+		SELECT ref_step FROM board WHERE ref=#{ref} and ref_level=#{ref_level} and ref_step>#{ref_step}
+	]]>
+	</select>
+	
+	<!--리플들끼리 글삭제하기(하위리플까지만지운다) -->
+	<delete id="deleteRe" parameterType="java.util.Map">
+	<![CDATA[
+		DELETE FROM board WHERE ref=#{ref} and ref_step>=#{ref_step} and ref_step<#{max_step}
+	]]>
+	
+	</delete>
+	<!-- 원글과 관련된글 다지우기 -->
+	<delete id="deleteOri" parameterType="java.util.Map">
+		<![CDATA[
+			DELETE FROM board WHERE ref=#{ref} and ref_step>=#{ref_step}
+		]]>
+	</delete>
+	
+	<!--장바구니 중복체크  -->
+	<select id="checkCart" resultType="int" parameterType="java.util.Map">
+		SELECT count(*) FROM cart c, stock s WHERE c.shoesNumber = s.shoesNumber AND c.memId=#{memId} AND s.shoesNumber=#{shoesNumber}
+	</select>
+	
+	<!--cNum찾기  -->
+	<select id="cNum" resultType="int" parameterType="java.util.Map">
+		SELECT cNum FROM cart c, stock s WHERE c.shoesNumber = s.shoesNumber AND c.memId=#{memId} AND s.shoesNumber=#{shoesNumber}
+	</select>
+	
+	<!--중복이있으면 장비구니 업데이트 -->
+	<update id="updateCart" parameterType="java.util.Map">
+		UPDATE cart SET cCount=cCount+#{count} WHERE cNum=#{cNum}
+	</update>
+	
+	<!-- 중복이 없으면 인설트 진행 -->
+	<insert id="insertCart" parameterType="java.util.Map">
+		INSERT INTO cart(cNum,memId,shoesNumber,cCount)
+		VALUES(cart_seq.nextval,#{memId},#{shoesNumber},#{count})
+	</insert>
+	
+	<!--장바구니 목록뿌리기-->
+	<select id="cartList" resultType="mvc.stroe.springStore.dto.shoesInfo" parameterType="String">
+		SELECT * FROM cart c, stock s WHERE c.shoesNumber = s.shoesNumber AND c.memId=#{memId}
+	</select>
+	
+	<!--장바구니 목록 보여주기-->
+	<select id="totalCart" parameterType="String" resultType="String">
+		select count(*) total from cart where memId=#{memId}
+	</select>
+	
+	<!--장바구니 참조값-->
+	<select id="modifyCartRef" resultType="mvc.stroe.springStore.dto.shoesInfo" parameterType="java.util.Map">
+		SELECT * FROM cart c, stock s  WHERE c.shoesNumber = s.shoesNumber AND c.memId=#{memId} AND s.shoesNumber=#{shoesNumber}	
+	</select>
+	
+	<!--장바구니 수량 수정-->
+	<update id="modifyCartPro" parameterType="java.util.Map">
+		UPDATE cart set cCount=#{cCount} WHERE memId=#{memId} AND shoesNumber=#{shoesNumber}
+	</update>
+	
+	<!--장바구니 지우기-->
+	<delete id="deleteCart" parameterType="String">
+		DELETE cart WHERE cNum=#{cNum}
+	</delete>
+	
+	<!--장바구니 컨펌-->
+	<insert id="confirmCart" statementType="CALLABLE"  parameterType="int">
+	{ 
+		CALL confirmcart(
+		#{cNum}
+		) 
+	}
+	</insert>
+	
+	<!--주문목록-->
+	<select id="buyList" resultType="mvc.stroe.springStore.dto.shoesInfo" parameterType="java.util.Map">
+		SELECT * FROM orderlist o, stock s	WHERE o.shoesNumber = s.shoesNumber	AND o.memId=#{memId}
+	</select>
+	
+	<!--주문목록 총갯수-->
+	<select id="totalBuyList" parameterType="String" resultType="String">
+		SELECT COUNT(*) total FROM orderList WHERE memId=#{memId}
+	</select>
+	
+	<!--주문목록 지우기-->
+	<delete id="deleteBuyList" parameterType="int">
+		DELETE orderList WHERE oNum=#{oNum}
+	</delete>
+	
+	<!--매니저용 총 주문확정 -->
+	<select id="totalDecide" resultType="String">
+		SELECT COUNT(*) total FROM orderList
+	</select>
+	
+	<!--메니저 주문확정 페이지-->
+	<select id="decide" resultType="mvc.stroe.springStore.dto.shoesInfo" parameterType="java.util.Map">
+		<![CDATA[
+			SELECT * FROM 
+			(select oNum, brand,memId, price, pic, modelName, oCount, shoesNumber, rowNum rNum from (select o.oNum, o.memId, s.price, s.pic, s.brand, s.modelName, o.oCount, s.shoesNumber from orderList o, stock s where o.shoesNumber=s.shoesNumber order by oNum desc))
+			where rNum >=#{startList} and rNum<=#{endList}
+		]]>
+	</select>
+	
+	<!--메니저 주문확정 페이지 삭제-->
+	<delete id="deleteDecideList" parameterType="String">
+		DELETE orderList WHERE oNum=#{oNum}
+	</delete>
+	
+	<!--주문정보가져오기-->
+	<select id="getDecideInfo" parameterType="String" resultType="mvc.stroe.springStore.dto.shoesInfo">
+		SELECT * FROM orderList WHERE oNum=#{oNum}
+	</select>
+	
+	<!--total에 주문정보 넣기-->
+	<insert id="insertRAT" parameterType="mvc.stroe.springStore.dto.shoesInfo">
+		INSERT INTO REFUND_AND_TOTAL(pNum,oNum,memId,shoesNumber,pCount,reg_date)
+		VALUES(rAt_seq.nextval,#{oNum},#{memId},#{shoesNumber},#{oCount},#{reg_date})
+	</insert>
+	
+	<!--오더리스트에서 지우기-->
+	<delete id="deleteOrderList" parameterType="String">
+		DELETE orderList WHERE oNum=#{oNum}
+	</delete>
+	
+	<!--스톡리스트 업데이트-->
+	<update id="updateStock" parameterType="mvc.stroe.springStore.dto.shoesInfo">
+		UPDATE STOCK SET STOCKCOUNT=STOCKCOUNT-#{oCount} WHERE shoesNumber=#{shoesNumber}
+	</update>	
+	
+	<!--원별 총매출-->
+	<select id="monthTotal" parameterType="java.util.Map" resultType="mvc.stroe.springStore.dto.Total">
+	<![CDATA[
+		SELECT SUM(s.price*r.pcount) total,
+		SUBSTR(TRUNC(r.reg_date),1,5) month
+		FROM stock s, refund_And_total r WHERE s.shoesNumber=r.shoesNumber
+		AND r.reg_date>=#{sD} AND r.reg_date<=#{eD}
+		GROUP BY SUBSTR(TRUNC(r.reg_date),1,5)
+		ORDER BY SUBSTR(TRUNC(r.reg_date),1,5)
+	]]>
+	</select>
+	
+	<!--총매출-->
+	<select id="total" parameterType="java.util.Map" resultType="int">
+	<![CDATA[
+		SELECT SUM(s.price*r.pcount) total,
+		SUBSTR(TRUNC(r.reg_date),1,2) month
+		FROM stock s, refund_And_total r WHERE s.shoesNumber=r.shoesNumber
+		AND r.reg_date>=#{sD} AND r.reg_date<=#{eD}
+		GROUP BY SUBSTR(TRUNC(r.reg_date),1,2)
+		ORDER BY SUBSTR(TRUNC(r.reg_date),1,2)
+	]]>
+	</select>
+	
+	<!--평균매출-->
+	<select id="avg" parameterType="java.util.Map" resultType="int">
+		<![CDATA[
+			SELECT ROUND(AVG(s.price*r.pcount),0) avg,
+			SUBSTR(TRUNC(r.reg_date),1,2) month
+			FROM stock s, refund_And_total r WHERE s.shoesNumber=r.shoesNumber
+			AND r.reg_date>=#{sD} AND r.reg_date<=#{eD}
+			GROUP BY SUBSTR(TRUNC(r.reg_date),1,2)
+			ORDER BY SUBSTR(TRUNC(r.reg_date),1,2)
+		]]>
+	</select>
+	
+	<!--회원 바로구매-->	
+	<insert id="nowBuy" parameterType="java.util.Map">
+		INSERT INTO orderList (oNum,memId,shoesNumber,oCount)
+		VALUES(order_num.nextval,#{memId},#{shoesNumber},#{count})
+	</insert>
+	<!-- 환불리스트 -->
+	<select id="refundList"  parameterType="String" resultType="mvc.stroe.springStore.dto.shoesInfo">
+		SELECT * FROM REFUND_AND_TOTAL r, stock s WHERE r.shoesNumber=s.shoesNumber AND memId = #{memId} AND dNum =1
+	</select>
+	
+	<!--환불리스트 총 갯수  -->
+	<select id="totalRefund" resultType="String" parameterType="String">
+		SELECT count(*) total FROM REFUND_AND_TOTAL WHERE memId=#{memId}
+	</select>
+	
+	<!--환불리스트 업데이트  -->
+	<update id="minusRefuntCount" parameterType="java.util.Map">
+		UPDATE refund_And_total SET pCount=pCount-#{pCount} WHERE pNum=#{pNum}
+	</update>
+	
+	<!--수량 0인리스트 지우기  -->
+	<delete id="ifZerodelete">
+		DELETE refund_And_total WHERE pCount=0
+	</delete>
+	
+	<!--환불수량만큼 stock 업데이트  -->
+	<update id="plusStock" parameterType="java.util.Map">
+		UPDATE STOCK SET stockCount=stockCount+#{pCount} WHERE shoesNumber=#{shoesNumber}
+	</update>
+	
+	<!-- 환불삭제 상태 값 주기 -->
+	<update id="deleteRefund" parameterType="String">
+		UPDATE refund_And_total SET dNUM=0 WHERE pNum=#{pNum}
+	</update>
+	
+	<!-- stock 조회수 증가 -->
+	<update id="cnt" parameterType="int">
+		UPDATE stock SET cnt=cnt+1 WHERE shoesNumber=#{shoesNumber}
+	</update>
+	
+</mapper>

@@ -1,0 +1,171 @@
+@charset "UTF-8";
+
+a{
+	text-decoration: none;
+}
+ul{
+	list-style-type: none;
+}
+	
+#contain{
+	/* 전체틀  */
+	margin :0 auto;
+	left : 200px;
+	padding : 20px;
+	width: 1800px;
+	height :2500px;
+	font-family : serif,Nanum Pen Script,fantasy;
+	font-size: 17px;
+	color: #1C1C1C;
+}
+#header{
+	/*매인메뉴와 쇼핑몰 이름 */
+	padding: 20px;
+}
+#header img{
+	position: relative;
+	left:30px;	
+}
+
+#loginBar{
+	float: right;
+	margin-right: 100px;
+	margin-top: 100px;
+}
+
+.inlineBlock li{
+	/* 로그인 회원가입 관리자 페이지 메뉴*/
+	display: inline-block;
+}
+
+#mainmenu{
+	/* 매인메뉴 */
+	padding: 10px;
+}
+#mainmenu ul{
+	/*매인매뉴 정렬 */
+	margin-right : 30px;
+	text-align: center;
+		
+}
+#mainmenu ul li{
+	/*매인매뉴 메뉴1 메뉴2 메뉴3 메뉴4  */
+	display: inline-block;
+	margin-left: 30px;
+	margin-right: 30px;
+	
+}
+ul li{
+	list-style-type: none;
+}
+#submenu{
+	width: 220px;
+	padding : 20px;
+	float: left;
+	/*왼쪽 사이드바 틀  */
+	position :fixed;
+	width:200px;
+	
+}
+#submenu ul{
+	/*  매뉴틀*/
+	padding:20px;	
+		
+}
+#submenu li{
+	/* 사이드바 안에 리스트  */
+	text-align :center;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	
+}
+.in{
+	margin-bottom: 40px;
+}
+.in table td{
+	border: 1px solid gray;
+}
+.in table th{
+	border: 1px solid gray;
+	background-color: gray
+}
+/*신상물품  */
+#contents{
+	/*컨텐츠 틀 */
+	margin:0 auto;
+	width:1000px;
+	height: 300px;
+	padding-left: 100px; 
+	margin-top:100px;
+}
+#contents span{
+	text-align : center;
+	margin-right: 50px;
+}
+#contents span img{
+	height: 220px;
+	width: 250px;
+}
+
+/* 최고 물품*/
+#contentss{
+	/*컨텐츠 틀 */
+	margin:0 auto;
+	width:1000px;
+	height: 300px;
+	padding-left: 100px; 
+	margin-top:600px;
+}
+#contentss span{
+	text-align : center;
+	margin-right: 50px;
+}
+#contentss span img{
+	height: 220px;
+	width: 250px;
+}
+/* 마우스 올리면 반투명 */
+#pic:hover{
+	opacity: 0.6;
+}
+#shoesname{
+	font-size: 14px;
+}
+#brand{
+	color: orange;
+}
+#price{
+	background-color: #8976bc;
+	color: white;
+}
+
+#aside{
+	/*광고 1*/
+	float:right;
+	position : fixed;
+	margin-left : 1600px;
+	margin-top : 350px;
+	width: 200px;
+	height:550px;
+}
+#footer{
+	/*발쪾 */
+	float : right;
+	margin-right : 400px;
+	margin-top:700px;
+	padding: 20px;
+	
+	
+}
+/* 회원가입 폼 */
+.join{
+	float:right;
+	position: relative;
+	right: 250px;
+	top: 150px;
+}
+.join td{
+	height: 50px;
+	border-bottom: 1px solid grey;
+	
+}

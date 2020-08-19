@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee https://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<!-- The definition of the Root Spring Container shared by all Servlets and Filters -->
+	<!--security xml 파일 설정-->
+	<!--web.xml상단에 있는 명령어와 치환-->
+		<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/spring/root-context.xml
+				classpath:/security-context.xml      <!-- 1. 시큐리티 설정파일 추가 -->
+				classpath:/security-datasource.xml   <!-- 1. 시큐리티 설정파일 추가 -->
+		</param-value>
+		</context-param>
+	<!--security xml 파일 설정-->
+		<!--시큐리티 리스너 추가-->
+	
+	<!--스프링 시큐리티에서 사용하는 세션 이벤트 처리 관련 리스너로서, 세션 만료 체크, 동시 로그인 제한 등의 기능을 제공  -->
+	<listener>
+		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+	</listener>
+	<!--시큐리티 리스너 추가 끝-->
+	
+	<!-- 한글 안깨지게 처리 -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- 한글 안깨지게 처리 끝-->
+	
+	<!-- 시큐리티 추가 시작 -->
+	<!-- 애플리케이션의 모든 요청을 스프링 시큐리티에서 처리하도록 하는 필터 -->
+	<!-- 보안 필터 체인 : 보안과 관련된 작업을 처리한다.
+		- 로그인 폼을 보여주거나, 접근 권한이 없는 경우 403 Forbidden(권한없음) 상태코드를 응답
+		- DelegatingFilterProxy -> FilterChainProxy -> SecurityFilterChain -> 실제 지원	-->
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>		
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping> 
+	<!-- 시큐리티 추가 종료 -->
+	
+	<!-- 에러처리 페이지 처리 -->
+	<error-page>
+		<error-code>500</error-code>
+		<location>/store/500</location>
+	</error-page> 
+	
+	<error-page>
+		<error-code>404</error-code>
+		<location>/store/404</location>
+	</error-page> 
+	
+	<!--세션 타임아웃 설정(480분) -->
+	<session-config>
+		<session-timeout>480</session-timeout>
+	</session-config>
+	
+	<!--////////////맨 아래쪽에 추가 끝///////////-->
+	
+	<!-- Creates the Spring Container shared by all Servlets and Filters -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- Processes application requests -->
+	<servlet>
+		<servlet-name>appServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/spring/appServlet/servlet-context.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+		
+	<servlet-mapping>
+		<servlet-name>appServlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+
+</web-app>
